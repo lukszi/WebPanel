@@ -1,6 +1,7 @@
 package siteRotation;
 
 import dataModel.repositories.WebsiteRepository;
+import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 //import org.slf4j.Logger;
@@ -26,8 +27,7 @@ public class BrowserController implements Runnable
     private BrowserController()
     {
         //Use Gecko driver in resources to create a selenium firefox driver
-        // TODO: Make this system independent by using all binaries
-        System.setProperty("webdriver.gecko.driver","server\\src\\main\\resources\\drivers\\geckodriver.exe");
+        setSystemAppropriateGeckoDriver();
         ffDriver = new FirefoxDriver();
         
         //Maximise the window
@@ -37,6 +37,18 @@ public class BrowserController implements Runnable
         SettingsProvider provider = SettingsProvider.getSettingProvider();
         standardDisplayDuration = Long.parseLong(provider.getProperty("displayduration"));
     }
+    
+    /**
+     * Loads the path to the correct gecko driver binary
+     */
+    private void setSystemAppropriateGeckoDriver()
+    {
+        if(SystemUtils.IS_OS_WINDOWS)
+            System.setProperty("webdriver.gecko.driver","server\\src\\main\\resources\\drivers\\windows\\geckodriver.exe");
+        else if(SystemUtils.IS_OS_LINUX) //TODO: Figure out a way to determine processor architecture system independent
+            System.setProperty("webdriver.gecko.driver","server\\src\\main\\resources\\drivers\\linux\\arm");
+    }
+    
     public static BrowserController getController()
     {
         if(controller == null)
